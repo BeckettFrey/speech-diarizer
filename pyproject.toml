@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "speech-diarizer"
+version = "0.1.0"
+description = "Speech-to-Text with Speaker Diarization and Word-Level Timestamps"
+readme = "README.md"
+authors = [
+    { name = "Beckett Frey", email = "TODO" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.11"
+dependencies = [
+    "faster-whisper>=1.2.0",
+    "pandas>=2.3.2",
+    "pyannote-audio>=3.3.2",
+    "tqdm>=4.67.1",
+]
+
+[project.urls]
+Homepage = "TODO"
+Repository = "TODO"
+Issues = "TODO"
+
+[project.scripts]
+speech-diarizer = "speech_diarizer.cli:main"
+extract-audio = "speech_diarizer.cli_extract:main"
+format-script = "speech_diarizer.cli_format:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/speech_diarizer"]
