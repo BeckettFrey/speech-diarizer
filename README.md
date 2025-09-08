@@ -2,17 +2,6 @@
 
 A Python tool for extracting transcripts from audio files with speaker diarization and word-level timestamps. Combines faster-whisper for transcription with pyannote speaker diarization to create detailed, timestamped transcripts with secondary movie-style formatting.
 
-## Features
-
-- 🎤 **Speech-to-Text**: High-quality transcription using Whisper models
-- 👥 **Speaker Diarization**: Automatic speaker identification and separation
-- ⏱️ **Word-Level Timestamps**: Precise timing for each word
-- 📊 **CSV Output**: Structured output with segment and word-level data
-- � **Movie-Style Scripts**: Human-readable formatted transcripts
-- 🚀 **GPU/CPU Support**: CUDA acceleration with CPU fallback
-- 📋 **Metadata Export**: Comprehensive processing information
-- 🎯 **PEP-Compliant**: Modern Python package structure with CLI entry points
-
 ## Requirements
 
 - Python 3.11+
@@ -182,54 +171,6 @@ Available Whisper models (smaller = faster, larger = more accurate):
 
 **⚠️ Important:** Use `--compute-type float32` when running on CPU to avoid errors!
 
-### Complete Example Workflow
-
-```bash
-# 1. Set up your HuggingFace token
-export HF_TOKEN="your_huggingface_token_here"
-
-# 2. Process a meeting recording with high accuracy (GPU)
-uv run speech-diarizer extract meeting_recording.wav meeting_transcript.csv \
-  --hf-token $HF_TOKEN \
-  --model large-v3 \
-  --device cuda \
-  --compute-type float16 \
-  --verbose
-
-# 3. Process on CPU (safer compatibility)
-uv run speech-diarizer extract meeting_recording.wav meeting_transcript.csv \
-  --hf-token $HF_TOKEN \
-  --model medium \
-  --device cpu \
-  --compute-type float32 \
-  --num-speakers 3
-
-# 4. Format the transcript
-uv run speech-diarizer format meeting_transcript.csv readable_script.txt
-
-# 5. Process multiple files with error handling
-for audio_file in *.wav; do
-  output_file="${audio_file%.wav}_transcript.csv"
-  script_file="${audio_file%.wav}_script.txt"
-  
-  echo "Processing $audio_file..."
-  
-  # Extract with CPU-safe settings
-  if uv run speech-diarizer extract "$audio_file" "$output_file" \
-    --hf-token $HF_TOKEN \
-    --model base \
-    --compute-type float32 \
-    --device cpu; then
-    
-    # Format if extraction succeeded
-    uv run speech-diarizer format "$output_file" "$script_file"
-    echo "✅ Completed: $script_file"
-  else
-    echo "❌ Failed: $audio_file"
-  fi
-done
-```
-
 ## Speaker Optimization
 
 ### Improving Accuracy with Known Speaker Counts
@@ -251,12 +192,6 @@ uv run speech-diarizer extract conference.wav output.csv \
   --compute-type float32
 ```
 
-**Common scenarios:**
-- **Interview**: `--num_speakers 2`
-- **Podcast**: `--min_speakers 2 --max_speakers 4`
-- **Meeting**: `--num_speakers 5` (if known exactly)
-- **Conference call**: `--min_speakers 3 --max_speakers 10`
-
 ### Speaker Parameter Guidelines
 
 | Parameter | Description | When to Use |
@@ -266,50 +201,6 @@ uv run speech-diarizer extract conference.wav output.csv \
 | `--max_speakers N` | Maximum speakers | Limit false speaker detection in noisy audio |
 
 **💡 Pro tip**: Specifying `--num_speakers` when you know the exact count can improve accuracy by 15-30%!
-
-## What Happens with Wrong Speaker Counts?
-
-### ⚠️ Too Many Speakers (Over-segmentation)
-**Example**: Audio has 2 speakers, but you specify `--num_speakers 5`
-
-**Result**: 
-- Single speakers get split into multiple identities
-- Same person appears as different speakers (SPEAKER_A, SPEAKER_B, etc.)
-- Excessive speaker changes
-- Warning: "detected number of speakers (X) is outside the given bounds"
-
-```bash
-# This will over-segment:
-uv run speech-diarizer extract audio.wav output.csv \
-  --hf-token $TOKEN \
-  --num-speakers 5 \
-  --compute-type float32
-# Output: 4 speakers detected when there are only 2 actual speakers
-```
-
-### ⚠️ Too Few Speakers (Under-segmentation)  
-**Example**: Audio has 4 speakers, but you specify `--num_speakers 1`
-
-**Result**:
-- Multiple speakers merged into single identity
-- Conversations appear as monologues
-- Lost speaker distinctions
-- Everything labeled as one speaker
-
-```bash
-# This will under-segment:
-uv run speech-diarizer extract audio.wav output.csv \
-  --hf-token $TOKEN \
-  --num-speakers 1 \
-  --compute-type float32
-# Output: All speech attributed to SPEAKER_A even with multiple voices
-```
-
-### 🎯 Getting the Right Count
-1. **Listen first**: Do a quick count of distinct voices
-2. **Start conservative**: Use `--min_speakers` and `--max_speakers` for ranges
-3. **Check output**: Review the formatted script for logical speaker changes
-4. **Iterate**: Adjust count based on results
 
 ## Output Format
 
@@ -398,38 +289,6 @@ Contains processing information:
 - Duration: No specific limits (longer files take more time)
 - Channels: Mono or stereo supported
 
-## Performance Tips
-
-### For Best Accuracy (GPU)
-```bash
-uv run speech-diarizer extract audio.wav output.csv \
-  --hf-token $HF_TOKEN \
-  --model large-v3 \
-  --device cuda \
-  --compute-type float16 \
-  --num-speakers 3
-```
-
-### For Fastest Processing (GPU)
-```bash
-uv run speech-diarizer extract audio.wav output.csv \
-  --hf-token $HF_TOKEN \
-  --model base \
-  --device cuda \
-  --compute-type int8 \
-  --min-speakers 2
-```
-
-### For CPU-Only Systems (Safe)
-```bash
-uv run speech-diarizer extract audio.wav output.csv \
-  --hf-token $HF_TOKEN \
-  --model base \
-  --device cpu \
-  --compute-type float32 \
-  --num-speakers 2
-```
-
 ### Performance vs. Accuracy Trade-offs
 
 | Model | Speed | Accuracy | Best For |
@@ -441,34 +300,6 @@ uv run speech-diarizer extract audio.wav output.csv \
 | `large-v3` | ⚡ | ⭐⭐⭐⭐⭐ | Best quality, slow |
 
 ## Troubleshooting
-
-### Common Issues
-
-1. **Float16 compute type error on CPU**: 
-   - **Solution**: Add `--compute-type float32` to your command
-   - **Example**: `uv run speech-diarizer extract audio.wav out.csv --hf-token TOKEN --compute-type float32`
-
-2. **CUDA not available**: 
-   - **Solution**: Use `--device cpu --compute-type float32`
-
-3. **HuggingFace authentication**: 
-   - **Solution**: Ensure token is valid and model access granted at [pyannote/speaker-diarization-3.1](https://huggingface.co/pyannote/speaker-diarization-3.1)
-
-4. **Memory errors**: 
-   - **Solution**: Use smaller model (`--model base`) or `--compute-type int8`
-
-5. **Slow processing**: 
-   - **Solution**: Use GPU (`--device cuda`) and smaller model, or use `--model base` for CPU
-
-6. **Command not found errors**:
-   - **Solution**: Always use `uv run` prefix: `uv run speech-diarizer --help`
-
-### Error Messages
-
-- `"Audio file must be a .wav file"`: Convert your audio to WAV format
-- `"HuggingFace token is required"`: Set the `--hf-token` parameter  
-- `"CUDA requested but not available"`: Install CUDA or use `--device cpu --compute-type float32`
-- `"Requested float16 compute type, but the target device or backend do not support efficient float16 computation"`: Add `--compute-type float32`
 
 ### Quick Fixes
 
@@ -494,17 +325,6 @@ uv run speech-diarizer extract audio.wav out.csv --hf-token TOKEN --device cpu -
 | **Format transcript** | `uv run speech-diarizer format transcript.csv script.txt` | Create readable script |
 | **GPU processing** | `uv run speech-diarizer extract audio.wav out.csv --hf-token TOKEN --device cuda --compute-type float16` | Faster with GPU |
 
-## CLI Commands Reference
-
-### Main Commands
-- `uv run speech-diarizer --help` - Show all commands
-- `uv run speech-diarizer extract --help` - Audio extraction help  
-- `uv run speech-diarizer format --help` - Script formatting help
-
-### Direct Entry Points  
-- `uv run extract-audio --help` - Direct extraction command
-- `uv run format-script --help` - Direct formatting command
-
 ### Environment Setup
 ```bash
 # Set token once (optional)
@@ -516,4 +336,4 @@ uv run speech-diarizer extract audio.wav out.csv --compute-type float32
 
 ## License
 
-[Add your license here]
+TBD
