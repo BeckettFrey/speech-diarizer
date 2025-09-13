@@ -22,6 +22,7 @@ dependencies = [
     "pyannote-audio>=3.3.2",
     "pydub>=0.25.1",
     "pytest>=8.4.2",
+    "PyYAML>=6.0.0",
     "rapidfuzz>=3.14.1",
     "tqdm>=4.67.1",
 ]
@@ -35,6 +36,7 @@ Issues = "TODO"
 speech-mine = "speech_mine.diarizer.cli:main"
 extract-audio = "speech_mine.diarizer.cli_extract:main"
 format-script = "speech_mine.diarizer.cli_format:main"
+chunk-audio = "speech_mine.pickaxe.cli_chunk:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/speech_mine"]
