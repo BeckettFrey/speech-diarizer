@@ -1,6 +1,8 @@
-# Speech Diarizer
 
-A Python tool for extracting transcripts from audio files with speaker diarization and word-level timestamps. Combines faster-whisper for transcription with pyannote speaker diarization to create detailed, timestamped transcripts with secondary movie-style formatting.
+# speech-mine
+
+Speech diarization and transcript formatting toolkit. Extract speaker-labeled transcripts from audio and format them into readable scripts.
+
 
 ## Requirements
 
@@ -8,6 +10,7 @@ A Python tool for extracting transcripts from audio files with speaker diarizati
 - HuggingFace access token (for pyannote models)
 - GPU recommended for faster processing
 - Audio files in .wav format
+
 
 ## Installation
 
@@ -19,7 +22,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Clone the repository
 git clone <repository-url>
-cd speech-diarizer
+cd speech-mine
 
 # Install dependencies and create virtual environment
 uv sync
@@ -27,67 +30,69 @@ uv sync
 
 ## Usage Examples
 
-### Primary CLI Commands (Recommended)
 
-#### Basic Usage
+### CLI Usage
+
+#### Main Entrypoint
 ```bash
 # Show all available commands
-uv run speech-diarizer --help
+uv run speech-mine --help
 
 # Extract transcript from audio file
-uv run speech-diarizer extract meeting.wav output.csv --hf-token YOUR_HUGGINGFACE_TOKEN
+uv run speech-mine extract meeting.wav output.csv --hf-token YOUR_HUGGINGFACE_TOKEN
 
 # Format CSV to readable movie-style script
-uv run speech-diarizer format output.csv formatted_script.txt
+uv run speech-mine format output.csv formatted_script.txt
 ```
 
-#### Alternative Entry Points
+#### Alternative Entrypoints
 ```bash
 # Direct audio extraction
 uv run extract-audio meeting.wav output.csv --hf-token YOUR_TOKEN
 
-# Direct script formatting  
+# Direct script formatting
 uv run format-script output.csv script.txt
 ```
 
-### Complete Workflow Examples
+
+### Workflow Example
 
 #### Meeting Transcription
 ```bash
 # 1. Extract with known speaker count (best accuracy)
-uv run speech-diarizer extract meeting.wav transcript.csv \
+uv run speech-mine extract meeting.wav transcript.csv \
   --hf-token YOUR_TOKEN \
   --num-speakers 4 \
   --model large-v3 \
   --compute-type float32
 
 # 2. Format to readable script
-uv run speech-diarizer format transcript.csv meeting_script.txt
+uv run speech-mine format transcript.csv meeting_script.txt
 
 # 3. Create custom speaker names template
-uv run speech-diarizer format transcript.csv script.txt --create-template
+uv run speech-mine format transcript.csv script.txt --create-template
 
 # 4. Format with custom speaker names
-uv run speech-diarizer format transcript.csv final_script.txt \
+uv run speech-mine format transcript.csv final_script.txt \
   --speakers transcript_speaker_names.json
 ```
 
 #### Interview Processing (2 speakers)
 ```bash
 # Perfect for interviews
-uv run speech-diarizer extract interview.wav interview.csv \
+uv run speech-mine extract interview.wav interview.csv \
   --hf-token YOUR_TOKEN \
   --num-speakers 2 \
   --model medium \
   --compute-type float32
 
-uv run speech-diarizer format interview.csv interview_script.txt
+uv run speech-mine format interview.csv interview_script.txt
 ```
 
 #### CPU-Only Processing
 ```bash
 # For systems without GPU
-uv run speech-diarizer extract audio.wav output.csv \
+uv run speech-mine extract audio.wav output.csv \
   --hf-token YOUR_TOKEN \
   --model base \
   --device cpu \
@@ -99,7 +104,7 @@ uv run speech-diarizer extract audio.wav output.csv \
 
 ```bash
 # Use specific Whisper model and GPU with known number of speakers
-uv run speech-diarizer extract interview.wav results.csv \
+uv run speech-mine extract interview.wav results.csv \
   --hf-token YOUR_TOKEN \
   --model large-v3 \
   --device cuda \
@@ -108,7 +113,7 @@ uv run speech-diarizer extract interview.wav results.csv \
   --verbose
 
 # Use smaller model for faster CPU processing
-uv run speech-diarizer extract podcast.wav transcript.csv \
+uv run speech-mine extract podcast.wav transcript.csv \
   --hf-token YOUR_TOKEN \
   --model base \
   --device cpu \
@@ -117,7 +122,7 @@ uv run speech-diarizer extract podcast.wav transcript.csv \
   --max-speakers 4
 
 # Meeting with exact number of known speakers (best accuracy)
-uv run speech-diarizer extract meeting.wav transcript.csv \
+uv run speech-mine extract meeting.wav transcript.csv \
   --hf-token YOUR_TOKEN \
   --num-speakers 5 \
   --model medium \
@@ -125,33 +130,27 @@ uv run speech-diarizer extract meeting.wav transcript.csv \
 
 # Format with custom speaker names
 echo '{"SPEAKER_00":"Alice","SPEAKER_01":"Bob"}' > speakers.json
-uv run speech-diarizer format transcript.csv script.txt --speakers speakers.json
+uv run speech-mine format transcript.csv script.txt --speakers speakers.json
 ```
+
 
 ### Batch Processing
 ```bash
-# Process multiple files
-for audio_file in *.wav; do
-  base_name="${audio_file%.wav}"
-  echo "Processing $audio_file..."
-  
-  # Extract transcript
-  uv run speech-diarizer extract "$audio_file" "${base_name}.csv" \
-    --hf-token YOUR_TOKEN \
-    --model medium \
-    --compute-type float32 \
-    --num-speakers 2
-  
-  # Format script
-  uv run speech-diarizer format "${base_name}.csv" "${base_name}_script.txt"
-done
+# See scripts/batch_process.sh and scripts/batch_format.sh for examples
+
+# Example: batch_format.sh
+./scripts/batch_format.sh input_dir output_dir
+
+# Example: batch_process.sh
+./scripts/batch_process.sh input_dir output_dir
 ```
+
 
 ### Model Options
 
 Available Whisper models (smaller = faster, larger = more accurate):
 - `tiny`: Fastest, least accurate
-- `base`: Good balance for quick processing  
+- `base`: Good balance for quick processing
 - `small`: Better accuracy, moderate speed
 - `medium`: Good accuracy and speed
 - `large-v3`: Best accuracy (default)
@@ -171,13 +170,14 @@ Available Whisper models (smaller = faster, larger = more accurate):
 
 **⚠️ Important:** Use `--compute-type float32` when running on CPU to avoid errors!
 
+
 ## Speaker Optimization
 
 ### Improving Accuracy with Known Speaker Counts
 
 **Best accuracy - exact number of speakers:**
 ```bash
-uv run speech-diarizer extract meeting.wav output.csv \
+uv run speech-mine extract meeting.wav output.csv \
   --hf-token $HF_TOKEN \
   --num-speakers 3 \
   --compute-type float32
@@ -185,7 +185,7 @@ uv run speech-diarizer extract meeting.wav output.csv \
 
 **Range-based speaker detection:**
 ```bash
-uv run speech-diarizer extract conference.wav output.csv \
+uv run speech-mine extract conference.wav output.csv \
   --hf-token $HF_TOKEN \
   --min-speakers 2 \
   --max-speakers 8 \
@@ -196,11 +196,12 @@ uv run speech-diarizer extract conference.wav output.csv \
 
 | Parameter | Description | When to Use |
 |-----------|-------------|-------------|
-| `--num_speakers N` | Exact number of speakers | When you know exactly how many speakers (best accuracy) |
-| `--min_speakers N` | Minimum speakers (default: 1) | Set to 2+ if you know multiple people speak |
-| `--max_speakers N` | Maximum speakers | Limit false speaker detection in noisy audio |
+| `--num-speakers N` | Exact number of speakers | When you know exactly how many speakers (best accuracy) |
+| `--min-speakers N` | Minimum speakers (default: 1) | Set to 2+ if you know multiple people speak |
+| `--max-speakers N` | Maximum speakers | Limit false speaker detection in noisy audio |
 
-**💡 Pro tip**: Specifying `--num_speakers` when you know the exact count can improve accuracy by 15-30%!
+**💡 Pro tip**: Specifying `--num-speakers` when you know the exact count can improve accuracy by 15-30%!
+
 
 ## Output Format
 
@@ -225,7 +226,7 @@ Contains both segment-level and word-level data:
 Human-readable movie-style script format:
 ```
 ================================================================================
-                                   TRANSCRIPT
+                   TRANSCRIPT
 ================================================================================
 
 RECORDING DETAILS:
@@ -239,24 +240,24 @@ Processed: 2025-09-08 16:35:00
 CAST:
 ----------------------------------------
 SPEAKER A
-SPEAKER B  
+SPEAKER B
 SPEAKER C
 
 TRANSCRIPT:
 ----------------------------------------
 
 [00:00 - 00:05] SPEAKER A:
-    Good morning everyone, let's start the meeting.
+  Good morning everyone, let's start the meeting.
 
 [00:06 - 00:12] SPEAKER B:
-    Thanks for organizing this. I have the quarterly
-    report ready to share.
+  Thanks for organizing this. I have the quarterly
+  report ready to share.
 
-    [...3 second pause...]
+  [...3 second pause...]
 
 [00:15 - 00:22] SPEAKER C:
-    Perfect, I'd like to hear about the sales numbers
-    first.
+  Perfect, I'd like to hear about the sales numbers
+  first.
 ```
 
 ### Metadata File (`output_metadata.json`)
@@ -274,6 +275,7 @@ Contains processing information:
   "processing_timestamp": "2025-09-08 14:30:00"
 }
 ```
+
 
 ## Setup Requirements
 
@@ -299,31 +301,33 @@ Contains processing information:
 | `medium` | ⚡⚡ | ⭐⭐⭐⭐ | Good quality, reasonable speed |
 | `large-v3` | ⚡ | ⭐⭐⭐⭐⭐ | Best quality, slow |
 
+
 ## Troubleshooting
 
 ### Quick Fixes
 
 ```bash
 # ❌ This fails on CPU:
-uv run speech-diarizer extract audio.wav out.csv --hf-token TOKEN
+uv run speech-mine extract audio.wav out.csv --hf-token TOKEN
 
 # ✅ This works on CPU:
-uv run speech-diarizer extract audio.wav out.csv --hf-token TOKEN --compute-type float32
+uv run speech-mine extract audio.wav out.csv --hf-token TOKEN --compute-type float32
 
 # ✅ This works on any system:
-uv run speech-diarizer extract audio.wav out.csv --hf-token TOKEN --device cpu --compute-type float32 --model base
+uv run speech-mine extract audio.wav out.csv --hf-token TOKEN --device cpu --compute-type float32 --model base
 ```
+
 
 ## Quick Start Examples
 
 | Use Case | Command | Notes |
 |----------|---------|-------|
-| **Basic extraction (CPU)** | `uv run speech-diarizer extract audio.wav out.csv --hf-token TOKEN --compute-type float32` | Safe for all systems |
-| **2-person interview** | `uv run speech-diarizer extract interview.wav out.csv --hf-token TOKEN --num-speakers 2 --compute-type float32` | Exact count for best accuracy |
-| **Meeting (known attendees)** | `uv run speech-diarizer extract meeting.wav out.csv --hf-token TOKEN --num-speakers 5 --compute-type float32` | Count participants beforehand |
-| **Fast processing** | `uv run speech-diarizer extract audio.wav out.csv --hf-token TOKEN --model base --compute-type float32` | Trade accuracy for speed |
-| **Format transcript** | `uv run speech-diarizer format transcript.csv script.txt` | Create readable script |
-| **GPU processing** | `uv run speech-diarizer extract audio.wav out.csv --hf-token TOKEN --device cuda --compute-type float16` | Faster with GPU |
+| **Basic extraction (CPU)** | `uv run speech-mine extract audio.wav out.csv --hf-token TOKEN --compute-type float32` | Safe for all systems |
+| **2-person interview** | `uv run speech-mine extract interview.wav out.csv --hf-token TOKEN --num-speakers 2 --compute-type float32` | Exact count for best accuracy |
+| **Meeting (known attendees)** | `uv run speech-mine extract meeting.wav out.csv --hf-token TOKEN --num-speakers 5 --compute-type float32` | Count participants beforehand |
+| **Fast processing** | `uv run speech-mine extract audio.wav out.csv --hf-token TOKEN --model base --compute-type float32` | Trade accuracy for speed |
+| **Format transcript** | `uv run speech-mine format transcript.csv script.txt` | Create readable script |
+| **GPU processing** | `uv run speech-mine extract audio.wav out.csv --hf-token TOKEN --device cuda --compute-type float16` | Faster with GPU |
 
 ### Environment Setup
 ```bash
@@ -331,8 +335,9 @@ uv run speech-diarizer extract audio.wav out.csv --hf-token TOKEN --device cpu -
 export HF_TOKEN="your_huggingface_token"
 
 # Then you can omit --hf-token:
-uv run speech-diarizer extract audio.wav out.csv --compute-type float32
+uv run speech-mine extract audio.wav out.csv --compute-type float32
 ```
+
 
 ## License
 

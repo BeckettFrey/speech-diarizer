@@ -40,7 +40,7 @@ csv_files=($(find "$INPUT_DIR" -maxdepth 1 -name "*.csv" ! -name "*_metadata.csv
 
 if [[ ${#csv_files[@]} -eq 0 ]]; then
     echo -e "${YELLOW}⚠️  No CSV files found in '$INPUT_DIR'${NC}"
-    echo -e "${BLUE}💡 Make sure you have CSV files from speech-diarizer extract command${NC}"
+    echo -e "${BLUE}💡 Make sure you have CSV files from speech-mine extract command${NC}"
     exit 0
 fi
 
@@ -62,7 +62,7 @@ for csv_file in "${csv_files[@]}"; do
     echo -e "${BLUE}📝 Processing: ${basename_csv}.csv${NC}"
     
     # Run the format command
-    if uv run speech-diarizer format "$csv_file" "$output_file"; then
+    if uv run speech-mine format "$csv_file" "$output_file"; then
         echo -e "${GREEN}✅ Success: ${basename_csv}_pretty.txt${NC}"
         ((success_count++))
     else

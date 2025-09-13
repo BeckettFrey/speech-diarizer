@@ -2,8 +2,7 @@ import pytest
 import json
 import tempfile
 import os
-from io import StringIO
-from diary_access import TranscriptionAccessTool, WordData, SegmentData
+from speech_mine.access import TranscriptionAccessTool
 
 
 class TestTranscriptionAccessTool:

@@ -1,5 +1,5 @@
 """
-Main CLI entry point for speech-diarizer.
+Main CLI entry point for speech-mine.
 
 This module provides a unified CLI with multiple subcommands.
 """
@@ -15,14 +15,14 @@ from .cli_format import format_command, create_format_parser
 def create_main_parser() -> argparse.ArgumentParser:
     """Create the main argument parser with subcommands."""
     parser = argparse.ArgumentParser(
-        prog="speech-diarizer",
+        prog="speech-mine",
         description="Speech-to-Text with Speaker Diarization and Script Formatting",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  speech-diarizer extract meeting.wav output.csv --hf-token YOUR_TOKEN
-  speech-diarizer format output.csv formatted_script.txt
-  speech-diarizer format output.csv script.txt --speakers custom_names.json
+  speech-mine extract meeting.wav output.csv --hf-token YOUR_TOKEN
+  speech-mine format output.csv formatted_script.txt
+  speech-mine format output.csv script.txt --speakers custom_names.json
         """
     )
     

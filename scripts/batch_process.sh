@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Batch transcription script for speech-diarizer
+# Batch transcription script for speech-mine
 # Usage: ./batch_process.sh [input_directory] [output_directory]
 
 # Configurable parameters
@@ -85,7 +85,7 @@ find "$INPUT_DIR" -type f \( -iname "*.wav" -o -iname "*.mp3" -o -iname "*.m4a" 
     print_status "Processing ($processed/$total_files): $filename"
     
     # Run the transcription command
-    if uv run speech-diarizer extract "$audio_file" "$output_file" \
+    if uv run speech-mine extract "$audio_file" "$output_file" \
         --model "$MODEL" \
         --num-speakers "$NUM_SPEAKERS" \
         --hf-token "$HF_TOKEN" \

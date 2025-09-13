@@ -1,38 +1,8 @@
 import csv
 import json
 from typing import Dict, List, Optional, Union, Any
-from dataclasses import dataclass
 from io import StringIO
-
-
-@dataclass
-class WordData:
-    """Data class for individual word information"""
-    type: str
-    speaker: str
-    start: float
-    end: float
-    text: str
-    word: str
-    word_position: int
-    confidence: float
-    overlap_duration: float
-    utterance_number: Optional[int] = None
-
-
-@dataclass
-class SegmentData:
-    """Data class for segment information"""
-    type: str
-    speaker: str
-    start: float
-    end: float
-    text: str
-    word: str
-    word_position: Optional[int]
-    confidence: float
-    overlap_duration: float
-    utterance_number: Optional[int] = None
+from .models import SegmentData, WordData
 
 
 class TranscriptionAccessTool:
@@ -345,12 +315,12 @@ class TranscriptionAccessTool:
 # Example usage:
 if __name__ == "__main__":
     # Load CSV from file
-    csv_file_path = "/Users/beckettfrey/Repos/waisman/speech-diarizer/output/transcription.csv" 
+    csv_file_path = "transcription.csv" 
     with open(csv_file_path, 'r', encoding='utf-8') as f:
         csv_data = f.read()
 
     # Load metadata from JSON file if it exists
-    metadata_file_path = "/Users/beckettfrey/Repos/waisman/speech-diarizer/output/metadata.json"
+    metadata_file_path = "metadata.json"
     metadata = {}
     try:
         with open(metadata_file_path, 'r', encoding='utf-8') as f:

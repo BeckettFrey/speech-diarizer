@@ -16,6 +16,7 @@ from typing import List, Optional, Tuple
 import pandas as pd
 import torch
 from tqdm import tqdm
+from .models import DiaryMetadata
 
 try:
     from faster_whisper import WhisperModel

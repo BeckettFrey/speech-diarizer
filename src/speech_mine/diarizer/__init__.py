@@ -10,5 +10,6 @@ __author__ = "Beckett Frey"
 
 from .processor import SpeechDiarizationProcessor
 from .formatter import ScriptFormatter
+from .models import DiaryMetadata
 
-__all__ = ["SpeechDiarizationProcessor", "ScriptFormatter"]
+__all__ = ["SpeechDiarizationProcessor", "ScriptFormatter", "DiaryMetadata"]
