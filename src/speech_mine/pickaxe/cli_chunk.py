@@ -10,7 +10,11 @@ import sys
 import os
 from pathlib import Path
 
-from speech_mine.pickaxe.chunk import chunk_audio_file
+try:
+    from .chunk import chunk_audio_file
+except ImportError:
+    # Fallback for direct execution
+    from chunk import chunk_audio_file
 
 
 def main():

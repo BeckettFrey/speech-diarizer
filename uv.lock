@@ -2301,6 +2301,7 @@ dependencies = [
     { name = "pyannote-audio" },
     { name = "pydub" },
     { name = "pytest" },
+    { name = "pyyaml" },
     { name = "rapidfuzz" },
     { name = "tqdm" },
 ]
@@ -2312,6 +2313,7 @@ requires-dist = [
     { name = "pyannote-audio", specifier = ">=3.3.2" },
     { name = "pydub", specifier = ">=0.25.1" },
     { name = "pytest", specifier = ">=8.4.2" },
+    { name = "pyyaml", specifier = ">=6.0.0" },
     { name = "rapidfuzz", specifier = ">=3.14.1" },
     { name = "tqdm", specifier = ">=4.67.1" },
 ]
