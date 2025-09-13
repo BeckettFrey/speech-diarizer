@@ -5,9 +5,6 @@ A Python package for extracting transcripts from audio files with speaker diariz
 and word-level timestamps.
 """
 
-__version__ = "0.1.0"
-__author__ = "Beckett Frey"
-
 from .processor import SpeechDiarizationProcessor
 from .formatter import ScriptFormatter
 from .models import DiaryMetadata

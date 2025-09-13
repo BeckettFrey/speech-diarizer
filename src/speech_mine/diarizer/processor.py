@@ -11,6 +11,7 @@ import logging
 import os
 import sys
 import time
+import math
 from typing import List, Optional, Tuple
 
 import pandas as pd
@@ -291,7 +292,7 @@ class SpeechDiarizationProcessor:
                 "end": round(segment_end, 3),
                 "text": segment_text,
                 "words": words_list,
-                "segment_confidence": getattr(segment, 'avg_logprob', 1.0),
+                "segment_confidence": math.exp(getattr(segment, 'avg_logprob', 0.0)),
                 "overlap_duration": round(max_overlap, 3)
             }
             
